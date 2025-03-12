@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCA Analysis Tool</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>PCA Analysis Tool</h1>
+      <div class="upload-section">
+        <p>
+          Upload a CSV file to perform PCA analysis. The first column should
+          contain row names.
+        </p>
+        <div class="file-upload">
+          <input type="file" id="csvFile" accept=".csv" />
+          <button id="uploadBtn">Analyze</button>
+        </div>
+        <div id="loading" class="loading hidden">
+          <div class="spinner"></div>
+          <p>Processing your data...</p>
+        </div>
+      </div>
+
+      <div id="results" class="results-section hidden">
+        <h2>Analysis Results</h2>
+
+        <div class="plots">
+          <div class="plot-container">
+            <h3>PCA Biplot</h3>
+            <img id="pcaPlot" src="" alt="PCA Biplot" />
+          </div>
+          <div class="plot-container">
+            <h3>Correlation Matrix</h3>
+            <img id="corrPlot" src="" alt="Correlation Matrix" />
+          </div>
+          <div class="plot-container">
+            <h3>Scree Plot</h3>
+            <img id="screePlot" src="" alt="Scree Plot" />
+          </div>
+        </div>
+
+        <div class="variance-section">
+          <h3>Explained Variance</h3>
+          <div id="explainedVariance" class="variance-table"></div>
+        </div>
+      </div>
+    </div>
+    <script src="/static/script.js"></script>
+  </body>
+</html>

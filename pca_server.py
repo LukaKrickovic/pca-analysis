@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import pandas as pd
 import numpy as np
@@ -18,6 +18,10 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 
 # Mount the static directory to serve files
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+@app.get("/")
+async def read_root():
+    return FileResponse(f"{STATIC_DIR}/index.html")
 
 @app.post("/analyze-pca/")
 async def analyze_pca(file: UploadFile = File(...)):
