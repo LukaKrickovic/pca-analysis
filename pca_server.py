@@ -43,9 +43,7 @@ async def analyze_pca(file: UploadFile = File(...)):
         
         analysis_id = str(uuid.uuid4())[:8]
         
-        plt.figure(figsize=(6, 5), dpi=300)  # Slightly larger figure for readability
-        
-        # Create scatter plot
+        plt.figure(figsize=(10, 10), dpi=300)        
         plt.scatter(pca_result[:, 0], pca_result[:, 1], color='black')
         
         # Annotate each point with its row name
@@ -58,12 +56,12 @@ async def analyze_pca(file: UploadFile = File(...)):
                         xytext=(-2, 5),  # text offset in points
                         bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.7))
         
-        # Add loadings vectors
+        # Add loadings vectors with increased length (changed from 0.95 to 1.5)
         loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
         for i, (x, y) in enumerate(zip(loadings[:, 0], loadings[:, 1])):
-            plt.arrow(0, 0, x*0.95, y*0.95, color='red', alpha=0.5,
+            plt.arrow(0, 0, x*2, y*2, color='red', alpha=0.5,
                      head_width=0.05, head_length=0.05)
-            plt.text(x, y, df_data.columns[i], fontsize=9, color='red')
+            plt.text(x*1.55, y*1.55, df_data.columns[i], fontsize=9, color='red')
         
         plt.grid()
         plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%})')
@@ -78,7 +76,7 @@ async def analyze_pca(file: UploadFile = File(...)):
         plt.close()
         
         # Create correlation plot (similar to corrplot.mixed in R)
-        plt.figure(figsize=(5, 4), dpi=300)
+        plt.figure(figsize=(10, 10), dpi=300)
         corr_matrix = df_data.corr()
         sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
         plt.title('Correlation Matrix')
@@ -89,7 +87,7 @@ async def analyze_pca(file: UploadFile = File(...)):
         plt.close()
         
         # Scree plot (similar to fviz_eig in R)
-        plt.figure(figsize=(5, 4), dpi=300)
+        plt.figure(figsize=(10, 10), dpi=300)
         explained_variance = pca.explained_variance_ratio_ * 100
         plt.bar(range(1, len(explained_variance) + 1), explained_variance)
         plt.plot(range(1, len(explained_variance) + 1), np.cumsum(explained_variance), 'ro-')
