@@ -9,7 +9,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/pca_server.py"
+            "dest": "pca_server.py"
         }
     ],
     "env": {
