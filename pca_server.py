@@ -25,10 +25,6 @@ async def read_root():
 
 @app.post("/analyze-pca/")
 async def analyze_pca(file: UploadFile = File(...)):
-    """
-    Upload a CSV file and perform PCA analysis.
-    Returns links to the generated PCA and correlation plots.
-    """
     try:
         contents = await file.read()
         content_str = contents.decode('utf-8')
@@ -42,15 +38,27 @@ async def analyze_pca(file: UploadFile = File(...)):
         scaler = StandardScaler()
         scaled_data = scaler.fit_transform(df_data)
         
-        pca = PCA()
+        pca = PCA(random_state=42)
         pca_result = pca.fit_transform(scaled_data)
         
         analysis_id = str(uuid.uuid4())[:8]
         
-        plt.figure(figsize=(5, 4), dpi=300)
+        plt.figure(figsize=(6, 5), dpi=300)  # Slightly larger figure for readability
         
+        # Create scatter plot
         plt.scatter(pca_result[:, 0], pca_result[:, 1], color='black')
         
+        # Annotate each point with its row name
+        for i, txt in enumerate(row_names):
+            plt.annotate(txt, 
+                        (pca_result[i, 0], pca_result[i, 1]),
+                        fontsize=8,
+                        ha='right',  # horizontal alignment
+                        textcoords='offset points',
+                        xytext=(-2, 5),  # text offset in points
+                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.7))
+        
+        # Add loadings vectors
         loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
         for i, (x, y) in enumerate(zip(loadings[:, 0], loadings[:, 1])):
             plt.arrow(0, 0, x*0.95, y*0.95, color='red', alpha=0.5,
@@ -61,6 +69,9 @@ async def analyze_pca(file: UploadFile = File(...)):
         plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%})')
         plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%})')
         plt.title('PCA Biplot')
+        
+        # Add tight layout to maximize the plot space
+        plt.tight_layout()
         
         pca_plot_path = f"{STATIC_DIR}/PCA_{analysis_id}.png"
         plt.savefig(pca_plot_path)
@@ -109,8 +120,3 @@ async def analyze_pca(file: UploadFile = File(...)):
             status_code=500,
             content={"success": False, "error": str(e)}
         )
-
-# Run with: uvicorn pca_server:app --reload
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
